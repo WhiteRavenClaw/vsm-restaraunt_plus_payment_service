@@ -104,7 +104,7 @@
 ## Запуск
 1) docker-compose up -d
 2) alembic revision --autogenerate -m "Add demo model"
-
+3) Запуск бэка из терминала uv run python main.py
 ## Cheatsheet
 ### Развертывание PostgreSQL
 Все уже настроено в docker-compose.yml, достаточно запустить `docker-compose up -d`.
