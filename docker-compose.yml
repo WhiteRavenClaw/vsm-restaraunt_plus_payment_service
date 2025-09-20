@@ -1,0 +1,36 @@
+# Use `docker-compose up -d` to start
+services:
+  postgres:
+    # See https://hub.docker.com/_/postgres
+    # Use `docker ps` and `docker logs -f vsm-restaurant-postgres-1` to check status
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=5FCCBA11-B16E-4C47-BFDF-06051C17226D # random password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=vsm_restaurant
+  dummy:
+    # This container can be used to access postgres_data volume even if postgres is not running
+    # `docker exec -ti vsm-restaurant-dummy-1 ash`
+    image: alpine:latest
+    command: sleep infinity
+    volumes:
+      - postgres_data:/data
+  # app:
+  #   build: .
+  #   ports:
+  #     - "8002:8000"
+    # app:
+    # build: .
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
+    # environment:
+    #   - DB_URL=postgresql+psycopg://postgres:5FCCBA11-B16E-4C47-BFDF-06051C17226D@postgres:5432/vsm_restaurant
+    # ports:
+    #   - "8000:8000"
+volumes:
+  postgres_data:
