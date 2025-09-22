@@ -6,6 +6,7 @@ from vsm_restaurant.db import  IngredientModel
 
 router = APIRouter()
 
+@router.get("/ingredients")
 async def get_ingredients(session: SessionDep):
     ingredients = session.exec(select(IngredientModel))
     return list(ingredients)
