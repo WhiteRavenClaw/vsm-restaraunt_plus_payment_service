@@ -7,7 +7,7 @@ from ..settings import Settings
 
 # Remember to import your models here for alembic to discover them
 from .demo import DemoModel
-from .menu import IngredientModel, MenuItemModel
+from .menu import IngredientModel, MenuItemModel, MenuItemCreate, IngredientCreate, IngredientUpdate
 
 
 def run_migrations(settings: Settings):

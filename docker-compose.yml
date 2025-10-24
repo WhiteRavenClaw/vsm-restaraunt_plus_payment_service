@@ -3,7 +3,7 @@ services:
   postgres:
     # See https://hub.docker.com/_/postgres
     # Use `docker ps` and `docker logs -f vsm-restaurant-postgres-1` to check status
-    image: postgres:17-alpine
+    image: postgres:17
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
