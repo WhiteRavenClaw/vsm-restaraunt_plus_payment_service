@@ -7,7 +7,10 @@ from ..settings import Settings
 
 # Remember to import your models here for alembic to discover them
 from .demo import DemoModel
-from .menu import IngredientModel, MenuItemModel, MenuItemCreate, IngredientCreate, IngredientUpdate
+from vsm_restaurant.db.menu import IngredientModel, MenuItemModel, MenuItemCreate, IngredientCreate, IngredientUpdate
+from vsm_restaurant.db.orders import Order, OrderItem
+from .cooking_task import CookingTask
+
 
 
 def run_migrations(settings: Settings):

@@ -8,6 +8,9 @@ from .demo import router as demo_router
 from .menu_api import router as menu_router
 from .ingredients_api import router as ingredients_router
 from .order_api import router as order_router
+from .cooking_api import router as cooking_router
+
+
 
 
 
@@ -22,6 +25,7 @@ app.include_router(demo_router)
 app.include_router(menu_router)
 app.include_router(ingredients_router)
 app.include_router(order_router)
+app.include_router(cooking_router)
 @app.get("/")
 async def root():
     return "Hello world"

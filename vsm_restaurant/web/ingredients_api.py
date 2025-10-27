@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header
 from sqlmodel import select
 from fastapi import Depends, HTTPException
-from vsm_restaurant.db import IngredientModel
+from vsm_restaurant.db.menu import IngredientModel
 from vsm_restaurant.dependencies import SessionDep
 from vsm_restaurant.db import IngredientCreate, IngredientUpdate
 #from vsm_restaurant.web.menu_api import check_token
