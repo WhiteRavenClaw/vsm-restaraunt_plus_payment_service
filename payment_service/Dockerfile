@@ -6,8 +6,8 @@ WORKDIR /app
 RUN pip install uv
 
 # Копируем зависимости (если в payment_service есть свой pyproject.toml и uv.lock)
-COPY pyproject.toml uv.lock ./
-RUN uv sync
+# COPY pyproject.toml uv.lock ./
+# RUN uv sync
 
 # Копируем код микросервиса
 COPY . .

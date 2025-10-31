@@ -1,9 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel
 from typing import Optional
-from sqlalchemy import Column, Integer, DateTime, Enum as PgEnum
-
+from sqlalchemy import Column, DateTime
 
 class CookingStatus(str, Enum):
     QUEUED = "queued"
@@ -12,7 +11,6 @@ class CookingStatus(str, Enum):
     DELIVERING = "delivering"
     DELIVERED = "delivered"
 
-
 class CookingTask(SQLModel, table=True):
     __tablename__ = "cooking_tasks"
 
@@ -20,4 +18,7 @@ class CookingTask(SQLModel, table=True):
     order_id: int = Field(foreign_key="orders.id")
     menu_item_id: int = Field(foreign_key="menu.id")
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime))
-    status: CookingStatus = Field(default=CookingStatus.QUEUED, sa_column=Column(PgEnum(CookingStatus)))
+    status: CookingStatus = Field(default=CookingStatus.QUEUED)
+    
+    # УБЕРИ отношения
+    # order: Optional["Order"] = Relationship(back_populates="cooking_tasks")

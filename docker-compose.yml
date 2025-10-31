@@ -22,9 +22,13 @@
 
 # volumes:
 #   postgres_data:
+# docker-compose.yml
+version: "3.9"
+
 services:
   postgres:
     image: postgres:17
+    container_name: vsm_postgres
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -36,26 +40,27 @@ services:
 
   dummy:
     image: alpine:latest
+    container_name: vsm_dummy
     command: sleep infinity
     volumes:
       - postgres_data:/data
 
-  app:
+  restaurant-api:
     build: .
+    container_name: vsm_restaurant_api
     depends_on:
       - postgres
     environment:
       - DB_URL=postgresql+psycopg://postgres:5FCCBA11-B16E-4C47-BFDF-06051C17226D@postgres:5432/vsm_restaurant
+      - PAYMENT_SERVICE_URL=http://payment-service:8001
     ports:
       - "8000:8000"
 
   payment-service:
-    build:
-      context: ./payment_service
+    build: ./payment_service
+    container_name: vsm_payment_service
     ports:
       - "8001:8001"
-    environment:
-      - RESTAURANT_API_URL=http://app:8000  # куда слать вебхуки
 
 volumes:
   postgres_data:
