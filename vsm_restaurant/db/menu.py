@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Numeric
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.sqlite import VARCHAR, INTEGER
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 from typing import List, Optional, Dict
 
 class IngredientModel(SQLModel, table=True):
@@ -18,3 +18,6 @@ class MenuItemModel(SQLModel, table=True):
     composition: list[dict] | None = Field(sa_column=Column(JSONB), default=None)
 
     __tablename__ = "menu"
+
+    order_items: List["OrderItem"] = Relationship(back_populates="menu_item")
+    

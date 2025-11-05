@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 from typing import Optional
 from sqlalchemy import Column, DateTime
 
@@ -19,6 +19,7 @@ class CookingTask(SQLModel, table=True):
     menu_item_id: int = Field(foreign_key="menu.id")
     created_at: datetime = Field(default_factory=datetime.now, sa_column=Column(DateTime))
     status: CookingStatus = Field(default=CookingStatus.QUEUED)
-    
+    order: Optional["Order"] = Relationship(back_populates="cooking_tasks")
+    menu_item: Optional["MenuItemModel"] = Relationship()
     # УБЕРИ отношения
     # order: Optional["Order"] = Relationship(back_populates="cooking_tasks")

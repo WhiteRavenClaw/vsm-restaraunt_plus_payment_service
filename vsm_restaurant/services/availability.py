@@ -15,7 +15,7 @@ def check_menu_item_availability(session: Session, menu_item_id: int) -> bool:
 
 def reserve_ingredients(session: Session, menu_item_id: int):
     menu_item = session.get(MenuItemModel, menu_item_id)
-    if not menu_item.composition:
+    if not menu_item or not menu_item.composition:
         return
     
     for ingredient_req in menu_item.composition:
