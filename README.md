@@ -113,7 +113,16 @@
 
 ### Alembic
 #### Генерация новых миграций
-alembic revision --autogenerate -m "Add demo model"
+
+**Простой способ (внутри контейнера):**
+```bash
+docker-compose exec restaurant-api uv run alembic revision --autogenerate -m "Add demo model"
+```
+
+**Или локально (если установлен uv):**
+```bash
+uv run alembic revision --autogenerate -m "Add demo model"
+```
 
 Hint: Не забудьте добавить импорт новых моделей в `vsm_restaurant/db/__init__.py`
 

@@ -57,7 +57,9 @@ services:
       - "8000:8000"
 
   payment-service:
-    build: ./payment_service
+    build:
+      context: .
+      dockerfile: payment_service/Dockerfile
     container_name: vsm_payment_service
     ports:
       - "8001:8001"

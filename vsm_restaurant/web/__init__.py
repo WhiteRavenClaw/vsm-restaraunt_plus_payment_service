@@ -35,7 +35,6 @@ app.include_router(passenger_router)
 @app.get("/")
 async def root():
     return "Hello world"
-
 @app.on_event("startup")
 async def startup_event():
     # Запускаем сервис таймаутов

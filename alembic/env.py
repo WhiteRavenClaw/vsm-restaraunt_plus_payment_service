@@ -1,5 +1,6 @@
 import logging
 from logging.config import fileConfig
+import os
 
 from alembic import context
 from sqlalchemy import engine_from_config
@@ -8,6 +9,7 @@ from sqlmodel import SQLModel
 
 # noinspection PyUnusedImports
 from vsm_restaurant.db import * # Necessary for automigrations
+from vsm_restaurant.settings import Settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,6 +27,12 @@ def has_basic_config_been_invoked():
 
 if not has_basic_config_been_invoked() and config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+# Use Settings to get DB URL from environment variables (for Docker) or config.env
+settings = Settings()
+# Override sqlalchemy.url from settings if available
+if settings.db_url:
+    config.set_main_option("sqlalchemy.url", settings.db_url)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
