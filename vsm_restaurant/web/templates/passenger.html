@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Меню</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        min-height: 100vh;
+        color: #e2e8f0;
+      }
+
+      header {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        padding: 20px 24px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(139, 92, 246, 0.4);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(139, 92, 246, 0.5);
+        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: rgba(30, 41, 59, 0.8);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(51, 65, 85, 0.9);
+        border-color: rgba(148, 163, 184, 0.3);
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 32px auto;
+        padding: 0 24px 48px;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 24px;
+      }
+
+      .menu-section {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .cart-section {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 100px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+      }
+
+      h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 20px;
+      }
+
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .menu-item {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .menu-item:hover {
+        border-color: rgba(139, 92, 246, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+      }
+
+      .menu-item-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #f1f5f9;
+        margin-bottom: 8px;
+      }
+
+      .menu-item-price {
+        font-size: 20px;
+        font-weight: 700;
+        color: #8b5cf6;
+        margin-bottom: 12px;
+      }
+
+      .menu-item-composition {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-bottom: 12px;
+        line-height: 1.5;
+      }
+
+      .menu-item-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .quantity-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(139, 92, 246, 0.2);
+        color: #c4b5fd;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+
+      .quantity-btn:hover {
+        background: rgba(139, 92, 246, 0.3);
+      }
+
+      .quantity-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e2e8f0;
+        min-width: 30px;
+        text-align: center;
+      }
+
+      .cart-items {
+        margin-bottom: 20px;
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .cart-item-info {
+        flex: 1;
+      }
+
+      .cart-item-name {
+        font-weight: 600;
+        color: #f1f5f9;
+        margin-bottom: 4px;
+      }
+
+      .cart-item-price {
+        font-size: 14px;
+        color: #94a3b8;
+      }
+
+      .cart-total {
+        padding: 20px 0;
+        border-top: 2px solid rgba(148, 163, 184, 0.2);
+        margin-top: 20px;
+      }
+
+      .cart-total-amount {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 20px;
+      }
+
+      .payment-methods {
+        margin-bottom: 20px;
+      }
+
+      .payment-method {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .payment-method:hover {
+        border-color: rgba(139, 92, 246, 0.4);
+        background: rgba(139, 92, 246, 0.1);
+      }
+
+      .payment-method input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+
+      .payment-method label {
+        flex: 1;
+        cursor: pointer;
+        font-weight: 600;
+        color: #e2e8f0;
+      }
+
+      .payment-method.selected {
+        border-color: #8b5cf6;
+        background: rgba(139, 92, 246, 0.2);
+      }
+
+      .place-id-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(15, 23, 42, 0.6);
+        color: #e2e8f0;
+        margin-bottom: 20px;
+      }
+
+      .place-id-input::placeholder {
+        color: #64748b;
+      }
+
+      .place-id-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
+        text-align: center;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 16px;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #94a3b8;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(51, 65, 85, 0.6);
+        color: #f1f5f9;
+      }
+
+      .qr-code {
+        width: 256px;
+        height: 256px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .qr-code img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      .payment-link {
+        margin-top: 20px;
+        padding: 12px;
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 8px;
+        word-break: break-all;
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toast {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+        color: #e2e8f0;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .toast.success {
+        border-left: 4px solid #48bb78;
+      }
+
+      .toast.error {
+        border-left: 4px solid #f56565;
+      }
+
+      .toast-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      .toast.success .toast-icon {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+      }
+
+      .toast.error .toast-icon {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #94a3b8;
+      }
+
+      .empty-cart {
+        text-align: center;
+        padding: 40px 20px;
+        color: #94a3b8;
+      }
+
+      @media (max-width: 1024px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+
+        .cart-section {
+          position: static;
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .header-actions {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .menu-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Меню</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="homeBtn">На главную</button>
+          <button class="btn btn-danger" id="logoutBtn">Выход</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="menu-section">
+        <h2>Доступные блюда</h2>
+        <div class="menu-grid" id="menuGrid">
+          <div class="empty-state">
+            <div class="loading" style="margin: 0 auto;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-section">
+        <h2>Корзина</h2>
+        <input
+          type="text"
+          class="place-id-input"
+          id="placeId"
+          placeholder="Номер места (например, 1A)"
+          required
+        />
+        <div class="cart-items" id="cartItems">
+          <div class="empty-cart">Корзина пуста</div>
+        </div>
+        <div class="cart-total" id="cartTotal" style="display: none;">
+          <div class="cart-total-amount">
+            Итого: <span id="totalAmount">0</span> ₽
+          </div>
+          <div class="payment-methods">
+            <div class="payment-method" data-method="cash">
+              <input type="radio" name="payment" id="payment-cash" value="cash" checked />
+              <label for="payment-cash">💵 Наличные</label>
+            </div>
+            <div class="payment-method" data-method="card_terminal">
+              <input type="radio" name="payment" id="payment-card" value="card_terminal" />
+              <label for="payment-card">💳 Карта (терминал)</label>
+            </div>
+            <div class="payment-method" data-method="sbp">
+              <input type="radio" name="payment" id="payment-sbp" value="sbp" />
+              <label for="payment-sbp">📱 СБП (QR код)</label>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="orderBtn" style="width: 100%;" disabled>
+            Оформить заказ
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="paymentModal">
+      <div class="modal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-header">
+          <h2 id="paymentTitle">Оплата заказа</h2>
+        </div>
+        <div id="paymentContent"></div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+      // Ждем загрузки библиотеки QRCode
+      let QRCode = null;
+      window.addEventListener('load', () => {
+        if (typeof window.QRCode !== 'undefined') {
+          QRCode = window.QRCode;
+        }
+      });
+      let menuItems = [];
+      let cart = {};
+      let currentOrder = null;
+
+      const menuGrid = document.getElementById("menuGrid");
+      const cartItems = document.getElementById("cartItems");
+      const cartTotal = document.getElementById("cartTotal");
+      const totalAmount = document.getElementById("totalAmount");
+      const placeIdInput = document.getElementById("placeId");
+      const orderBtn = document.getElementById("orderBtn");
+      const paymentModal = document.getElementById("paymentModal");
+      const paymentContent = document.getElementById("paymentContent");
+      const paymentTitle = document.getElementById("paymentTitle");
+      const toastContainer = document.getElementById("toastContainer");
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div class="toast-icon">${type === "success" ? "✓" : "✕"}</div>
+          <div>${message}</div>
+        `;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideIn 0.3s ease reverse";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!response.ok) {
+          let detail = "";
+          try {
+            const data = await response.json();
+            detail = data.detail || response.statusText;
+          } catch (err) {
+            detail = response.statusText;
+          }
+          throw new Error(detail);
+        }
+        if (response.status === 204) return null;
+        return response.json();
+      }
+
+      async function loadMenu() {
+        try {
+          const data = await fetchJSON("/passenger/menu/available");
+          menuItems = data.available_items || [];
+          renderMenu();
+        } catch (error) {
+          showToast(`Ошибка загрузки меню: ${error.message}`, "error");
+          menuGrid.innerHTML = `
+            <div class="empty-state">
+              <div>⚠️</div>
+              <div>Не удалось загрузить меню</div>
+            </div>
+          `;
+        }
+      }
+
+      function renderMenu() {
+        if (menuItems.length === 0) {
+          menuGrid.innerHTML = `
+            <div class="empty-state">
+              <div>🍽️</div>
+              <div>Блюд пока нет</div>
+            </div>
+          `;
+          return;
+        }
+
+        menuGrid.innerHTML = menuItems.map(item => {
+          const quantity = cart[item.id] || 0;
+          return `
+            <div class="menu-item">
+              <div class="menu-item-name">${escapeHtml(item.name)}</div>
+              <div class="menu-item-price">${item.price.toFixed(2)} ₽</div>
+              <div class="menu-item-actions">
+                <div class="quantity-controls">
+                  <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                  <span class="quantity-value">${quantity}</span>
+                  <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function increaseQuantity(itemId) {
+        cart[itemId] = (cart[itemId] || 0) + 1;
+        updateCart();
+        renderMenu();
+      }
+
+      function decreaseQuantity(itemId) {
+        if (cart[itemId] && cart[itemId] > 0) {
+          cart[itemId]--;
+          if (cart[itemId] === 0) {
+            delete cart[itemId];
+          }
+          updateCart();
+          renderMenu();
+        }
+      }
+
+      function updateCart() {
+        const cartArray = Object.entries(cart)
+          .filter(([id, qty]) => qty > 0)
+          .map(([id, qty]) => {
+            const item = menuItems.find(m => m.id === parseInt(id));
+            return { item, quantity: qty };
+          });
+
+        if (cartArray.length === 0) {
+          cartItems.innerHTML = '<div class="empty-cart">Корзина пуста</div>';
+          cartTotal.style.display = "none";
+          orderBtn.disabled = true;
+          return;
+        }
+
+        const total = cartArray.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
+        totalAmount.textContent = total.toFixed(2);
+        cartTotal.style.display = "block";
+        orderBtn.disabled = !placeIdInput.value.trim();
+
+        cartItems.innerHTML = cartArray.map(({ item, quantity }) => `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${escapeHtml(item.name)}</div>
+              <div class="cart-item-price">${item.price.toFixed(2)} ₽ × ${quantity}</div>
+            </div>
+            <div style="font-weight: 600; color: #f1f5f9;">
+              ${(item.price * quantity).toFixed(2)} ₽
+            </div>
+          </div>
+        `).join("");
+      }
+
+      placeIdInput.addEventListener("input", () => {
+        orderBtn.disabled = !placeIdInput.value.trim() || Object.keys(cart).length === 0;
+      });
+
+      document.querySelectorAll(".payment-method").forEach(method => {
+        method.addEventListener("click", () => {
+          document.querySelectorAll(".payment-method").forEach(m => m.classList.remove("selected"));
+          method.classList.add("selected");
+          method.querySelector("input[type='radio']").checked = true;
+        });
+      });
+
+      orderBtn.addEventListener("click", async () => {
+        const placeId = placeIdInput.value.trim();
+        if (!placeId) {
+          showToast("Введите номер места", "error");
+          return;
+        }
+
+        const cartArray = Object.entries(cart)
+          .filter(([id, qty]) => qty > 0)
+          .map(([id, qty]) => ({
+            menu_item_id: parseInt(id),
+            quantity: qty
+          }));
+
+        if (cartArray.length === 0) {
+          showToast("Корзина пуста", "error");
+          return;
+        }
+
+        const paymentMethod = document.querySelector("input[name='payment']:checked").value;
+
+        try {
+          orderBtn.disabled = true;
+          orderBtn.innerHTML = '<span class="loading"></span> Оформление...';
+
+          const response = await fetchJSON("/orders", {
+            method: "POST",
+            body: JSON.stringify({
+              place_id: placeId,
+              payment_method: paymentMethod,
+              items: cartArray
+            }),
+          });
+
+          currentOrder = response;
+
+          if (paymentMethod === "sbp" && response.payment_link) {
+            showPaymentModal(response.payment_link, "Оплата через СБП");
+          } else if (paymentMethod === "card_online" && response.payment_link) {
+            showPaymentModal(response.payment_link, "Оплата картой онлайн");
+          } else {
+            showToast("Заказ успешно оформлен!");
+            cart = {};
+            placeIdInput.value = "";
+            updateCart();
+            renderMenu();
+          }
+        } catch (error) {
+          showToast(`Ошибка оформления заказа: ${error.message}`, "error");
+        } finally {
+          orderBtn.disabled = false;
+          orderBtn.textContent = "Оформить заказ";
+        }
+      });
+
+      function showPaymentModal(paymentLink, title) {
+        paymentTitle.textContent = title;
+        if (title.includes("СБП")) {
+          paymentContent.innerHTML = `
+            <p style="color: #94a3b8; margin-bottom: 20px;">Отсканируйте QR код для оплаты</p>
+            <div class="qr-code" id="qrCode"></div>
+            <div class="payment-link" style="margin-top: 16px; padding: 12px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; word-break: break-all; color: #94a3b8; font-size: 12px;">${escapeHtml(paymentLink)}</div>
+            <button class="btn btn-primary" onclick="window.open('${escapeHtml(paymentLink)}', '_blank')" style="margin-top: 20px;">
+              Открыть ссылку
+            </button>
+          `;
+          const qrCodeElement = document.getElementById("qrCode");
+          setTimeout(() => {
+            // Проверяем наличие библиотеки QRCode
+            const QRCodeLib = window.QRCode || QRCode;
+            if (QRCodeLib && typeof QRCodeLib.toCanvas === 'function') {
+              const canvas = document.createElement("canvas");
+              QRCodeLib.toCanvas(canvas, paymentLink, {
+                width: 224,
+                margin: 2,
+                color: {
+                  dark: "#000000",
+                  light: "#FFFFFF"
+                }
+              }, (error) => {
+                if (error) {
+                  console.error('QR Code generation error:', error);
+                  qrCodeElement.innerHTML = `<div style="color: #94a3b8; padding: 20px; text-align: center;">QR код не может быть сгенерирован. Используйте ссылку ниже.</div>`;
+                } else {
+                  qrCodeElement.innerHTML = '';
+                  qrCodeElement.appendChild(canvas);
+                }
+              });
+            } else {
+              // Если библиотека не загружена, используем онлайн сервис для генерации QR кода
+              const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=224x224&data=${encodeURIComponent(paymentLink)}`;
+              qrCodeElement.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="max-width: 100%; height: auto;" />`;
+            }
+          }, 200);
+        } else {
+          paymentContent.innerHTML = `
+            <p style="color: #94a3b8; margin-bottom: 20px;">Перейдите по ссылке для оплаты</p>
+            <div class="payment-link" style="margin-top: 16px; padding: 12px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; word-break: break-all; color: #94a3b8; font-size: 12px;">${escapeHtml(paymentLink)}</div>
+            <button class="btn btn-primary" onclick="window.open('${escapeHtml(paymentLink)}', '_blank')" style="margin-top: 20px;">
+              Перейти к оплате
+            </button>
+          `;
+        }
+        paymentModal.classList.add("active");
+      }
+
+      document.getElementById("modalClose").addEventListener("click", () => {
+        paymentModal.classList.remove("active");
+        if (currentOrder && currentOrder.status === "paid_and_queued") {
+          cart = {};
+          placeIdInput.value = "";
+          updateCart();
+          renderMenu();
+        }
+      });
+
+      paymentModal.addEventListener("click", (e) => {
+        if (e.target === paymentModal) {
+          paymentModal.classList.remove("active");
+          if (currentOrder && currentOrder.status === "paid_and_queued") {
+            cart = {};
+            placeIdInput.value = "";
+            updateCart();
+            renderMenu();
+          }
+        }
+      });
+
+      document.getElementById("homeBtn").addEventListener("click", () => {
+        window.location.href = window.location.origin + "/";
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/logout";
+        document.body.appendChild(form);
+        form.submit();
+      });
+
+      window.increaseQuantity = increaseQuantity;
+      window.decreaseQuantity = decreaseQuantity;
+
+      loadMenu();
+    </script>
+  </body>
+</html>
+

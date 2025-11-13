@@ -71,7 +71,7 @@ async def create_order(order_data: OrderCreate, session: SessionDep, background_
         place_id=order_data.place_id,
         payment_method=order_data.payment_method,
         total_price=total_price,
-        status=OrderStatus.WAITING_PAYMENT if order_data.payment_method == PaymentMethod.CARD_ONLINE else OrderStatus.PAID
+        status=OrderStatus.WAITING_PAYMENT if order_data.payment_method in [PaymentMethod.CARD_ONLINE, PaymentMethod.SBP] else OrderStatus.PAID
     )
     
     session.add(order)
@@ -88,29 +88,37 @@ async def create_order(order_data: OrderCreate, session: SessionDep, background_
         session.add(order_item)
     
     # Логика оплаты
-    if order.payment_method == PaymentMethod.CARD_ONLINE:
+    if order.payment_method in [PaymentMethod.CARD_ONLINE, PaymentMethod.SBP]:
         try:
             settings = Settings()
-            set_payment_timeout(session,order,settings.payment_timeout_minutes)
+            set_payment_timeout(session, order, settings.payment_timeout_minutes)
             payment_url = get_payment_service_url()
-            r = httpx.post(f"{payment_url}/create", json={"order_id": order.id,"amount":total_price})
+            payment_type = "sbp" if order.payment_method == PaymentMethod.SBP else "card"
+            r = httpx.post(
+                f"{payment_url}/create",
+                json={"order_id": order.id, "amount": total_price, "type": payment_type}
+            )
             r.raise_for_status()
             payment_data = r.json()
             order.payment_link = payment_data.get("payment_link")
             session.commit()
-            return {"order_id": order.id, "payment_link": order.payment_link, "status": "waiting_payment","timeout_minutes":settings.payment_timeout_minutes}
-        
+            return {
+                "order_id": order.id,
+                "payment_link": order.payment_link,
+                "status": "waiting_payment",
+                "timeout_minutes": settings.payment_timeout_minutes,
+                "payment_method": order.payment_method.value
+            }
         except Exception as e:
             logger.error(f"Payment service error: {e}")
-            # Отменяем заказ при ошибке оплаты
             session.delete(order)
             session.commit()
             raise HTTPException(status_code=500, detail=f"Payment service error: {e}")
-        
     
-    # Для постоплаты сразу создаем задачи на готовку
+    # Для постоплаты (наличные, карта терминал) сразу создаем задачи на готовку
     else:
         for item_data in order_data.items:
+            reserve_ingredients(session, item_data.menu_item_id)
             task = CookingTask(
                 order_id=order.id,
                 menu_item_id=item_data.menu_item_id,

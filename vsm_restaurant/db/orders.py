@@ -8,6 +8,7 @@ class PaymentMethod(str, Enum):
     CARD_ONLINE = "card_online"
     CARD_TERMINAL = "card_terminal"
     CASH = "cash"
+    SBP = "sbp"
 
 class OrderStatus(str, Enum):
     WAITING_PAYMENT = "waiting_payment"

@@ -34,15 +34,21 @@ app = FastAPI(title="Fake Payment Service")
 payments_db = {}
 
 @app.post("/create")
-def create_payment(order_id: int, amount: float):
+def create_payment(order_id: int, amount: float, type: str = "card"):
     # Генерируем ссылку на оплату
     payment_id = f"pay_{random.randint(1000, 9999)}"
-    payment_link = f"http://localhost:8001/pay/{payment_id}"
+    
+    # Для СБП генерируем специальную ссылку
+    if type == "sbp":
+        payment_link = f"http://localhost:8001/pay/sbp/{payment_id}"
+    else:
+        payment_link = f"http://localhost:8001/pay/{payment_id}"
     
     payments_db[payment_id] = {
         "order_id": order_id,
         "amount": amount,
-        "status": "pending"
+        "status": "pending",
+        "type": type
     }
     
     return {
@@ -69,6 +75,78 @@ def simulate_payment(payment_id: str):
             <form action="/cancel/{payment_id}" method="post">
                 <button type="submit">Отмена</button>
             </form>
+        </body>
+    </html>
+    """
+
+@app.get("/pay/sbp/{payment_id}")
+def simulate_sbp_payment(payment_id: str):
+    """Симуляция страницы оплаты через СБП"""
+    payment = payments_db.get(payment_id)
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    return f"""
+    <html>
+        <head>
+            <title>Оплата через СБП</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    max-width: 600px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    background: #f5f5f5;
+                }}
+                .container {{
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }}
+                h1 {{
+                    color: #333;
+                }}
+                .amount {{
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #4CAF50;
+                    margin: 20px 0;
+                }}
+                button {{
+                    background: #4CAF50;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    margin: 10px 5px;
+                }}
+                button:hover {{
+                    background: #45a049;
+                }}
+                .cancel-btn {{
+                    background: #f44336;
+                }}
+                .cancel-btn:hover {{
+                    background: #da190b;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Оплата через СБП</h1>
+                <p>Заказ #{payment['order_id']}</p>
+                <div class="amount">Сумма: {payment['amount']} руб.</div>
+                <p>Для оплаты используйте QR код или перейдите по ссылке в приложении банка.</p>
+                <form action="/confirm/{payment_id}" method="post">
+                    <button type="submit">Подтвердить оплату</button>
+                </form>
+                <form action="/cancel/{payment_id}" method="post">
+                    <button type="submit" class="cancel-btn">Отмена</button>
+                </form>
+            </div>
         </body>
     </html>
     """

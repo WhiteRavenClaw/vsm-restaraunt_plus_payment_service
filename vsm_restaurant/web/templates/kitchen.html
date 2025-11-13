@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Кухня</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        min-height: 100vh;
+        color: #e2e8f0;
+      }
+
+      header {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        padding: 20px 24px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(139, 92, 246, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(139, 92, 246, 0.5);
+        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+      }
+
+      .btn-secondary {
+        background: rgba(30, 41, 59, 0.8);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(51, 65, 85, 0.9);
+        border-color: rgba(148, 163, 184, 0.3);
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 32px auto;
+        padding: 0 24px 48px;
+      }
+
+      .content-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .search-box {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 12px 16px 12px 40px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(15, 23, 42, 0.6);
+        color: #e2e8f0;
+        transition: border-color 0.2s ease;
+      }
+
+      .search-box input::placeholder {
+        color: #64748b;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        pointer-events: none;
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #94a3b8;
+        border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+      }
+
+      td {
+        padding: 16px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        color: #e2e8f0;
+      }
+
+      tbody tr:hover {
+        background: rgba(51, 65, 85, 0.4);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .modal-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #94a3b8;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(51, 65, 85, 0.6);
+        color: #f1f5f9;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        color: #cbd5e1;
+        margin-bottom: 8px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(15, 23, 42, 0.6);
+        color: #e2e8f0;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .form-group input::placeholder {
+        color: #64748b;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .ingredients-list {
+        margin-top: 12px;
+      }
+
+      .ingredient-item {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+
+      .ingredient-item select,
+      .ingredient-item input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 6px;
+        background: rgba(15, 23, 42, 0.6);
+        color: #e2e8f0;
+        font-size: 14px;
+      }
+
+      .ingredient-item select:focus,
+      .ingredient-item input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+      }
+
+      .ingredient-item input {
+        width: 100px;
+      }
+
+      .btn-remove {
+        padding: 8px 12px;
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .btn-remove:hover {
+        background: rgba(239, 68, 68, 0.3);
+      }
+
+      .btn-add-ingredient {
+        width: 100%;
+        padding: 10px;
+        background: rgba(139, 92, 246, 0.2);
+        color: #c4b5fd;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 8px;
+      }
+
+      .btn-add-ingredient:hover {
+        background: rgba(139, 92, 246, 0.3);
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toast {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+        color: #e2e8f0;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .toast.success {
+        border-left: 4px solid #48bb78;
+      }
+
+      .toast.error {
+        border-left: 4px solid #f56565;
+      }
+
+      .toast-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      .toast.success .toast-icon {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+      }
+
+      .toast.error .toast-icon {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #94a3b8;
+      }
+
+      .composition {
+        font-size: 13px;
+        color: #94a3b8;
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .header-actions {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .toolbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-box {
+          max-width: 100%;
+        }
+
+        .modal {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Кухня</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="addBtn">+ Добавить блюдо</button>
+          <button class="btn btn-secondary" id="homeBtn">На главную</button>
+          <button class="btn btn-danger" id="logoutBtn">Выход</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="content-card">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Поиск по названию..." />
+          </div>
+          <button class="btn btn-secondary" id="refreshBtn">🔄 Обновить</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Состав</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="menuBody">
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <div class="loading" style="margin: 0 auto;"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalTitle">Добавить блюдо</h2>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <form id="menuForm">
+          <input type="hidden" id="menuId" />
+          <div class="form-group">
+            <label for="menuName">Название блюда</label>
+            <input type="text" id="menuName" required minlength="2" placeholder="Например, Салат Цезарь" />
+          </div>
+          <div class="form-group">
+            <label for="menuPrice">Цена (₽)</label>
+            <input type="number" id="menuPrice" required min="0" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label>Ингредиенты</label>
+            <div id="ingredientsList" class="ingredients-list"></div>
+            <button type="button" class="btn-add-ingredient" id="addIngredientBtn">+ Добавить ингредиент</button>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="modalCancel">Отмена</button>
+            <button type="submit" class="btn btn-primary" id="modalSubmit">Сохранить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      let menuItems = [];
+      let ingredients = [];
+      let filteredItems = [];
+
+      const modalOverlay = document.getElementById("modalOverlay");
+      const modalTitle = document.getElementById("modalTitle");
+      const menuForm = document.getElementById("menuForm");
+      const menuId = document.getElementById("menuId");
+      const menuName = document.getElementById("menuName");
+      const menuPrice = document.getElementById("menuPrice");
+      const ingredientsList = document.getElementById("ingredientsList");
+      const menuBody = document.getElementById("menuBody");
+      const searchInput = document.getElementById("searchInput");
+      const toastContainer = document.getElementById("toastContainer");
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div class="toast-icon">${type === "success" ? "✓" : "✕"}</div>
+          <div>${message}</div>
+        `;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideIn 0.3s ease reverse";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function openModal(item = null) {
+        if (item) {
+          modalTitle.textContent = "Редактировать блюдо";
+          menuId.value = item.id;
+          menuName.value = item.name;
+          menuPrice.value = item.price;
+          renderIngredients(item.composition || []);
+        } else {
+          modalTitle.textContent = "Добавить блюдо";
+          menuId.value = "";
+          menuName.value = "";
+          menuPrice.value = "";
+          renderIngredients([]);
+        }
+        modalOverlay.classList.add("active");
+        menuName.focus();
+      }
+
+      function closeModal() {
+        modalOverlay.classList.remove("active");
+        menuForm.reset();
+      }
+
+      function renderIngredients(composition = []) {
+        ingredientsList.innerHTML = "";
+        composition.forEach((comp, index) => {
+          addIngredientRow(comp.ingredient_id, comp.quantity, index);
+        });
+        if (composition.length === 0) {
+          addIngredientRow(null, 1, 0);
+        }
+      }
+
+      function addIngredientRow(ingredientId = null, quantity = 1, index = null) {
+        const row = document.createElement("div");
+        row.className = "ingredient-item";
+        row.innerHTML = `
+          <select class="ingredient-select" data-index="${index !== null ? index : ingredientsList.children.length}">
+            <option value="">Выберите ингредиент</option>
+            ${ingredients.map(ing => `
+              <option value="${ing.id}" ${ingredientId === ing.id ? "selected" : ""}>
+                ${ing.name} (остаток: ${ing.stock})
+              </option>
+            `).join("")}
+          </select>
+          <input type="number" class="ingredient-quantity" min="1" value="${quantity}" placeholder="Кол-во" />
+          <button type="button" class="btn-remove">Удалить</button>
+        `;
+        row.querySelector(".btn-remove").addEventListener("click", () => row.remove());
+        ingredientsList.appendChild(row);
+      }
+
+      document.getElementById("addBtn").addEventListener("click", () => openModal());
+      document.getElementById("modalClose").addEventListener("click", closeModal);
+      document.getElementById("modalCancel").addEventListener("click", closeModal);
+      document.getElementById("addIngredientBtn").addEventListener("click", () => addIngredientRow());
+      modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) closeModal();
+      });
+
+      async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!response.ok) {
+          let detail = "";
+          try {
+            const data = await response.json();
+            detail = data.detail || response.statusText;
+          } catch (err) {
+            detail = response.statusText;
+          }
+          throw new Error(detail);
+        }
+        if (response.status === 204) return null;
+        return response.json();
+      }
+
+      async function loadIngredients() {
+        try {
+          ingredients = await fetchJSON("/kitchen/api/ingredients");
+        } catch (error) {
+          showToast(`Ошибка загрузки ингредиентов: ${error.message}`, "error");
+        }
+      }
+
+      async function loadMenu() {
+        try {
+          menuItems = await fetchJSON("/kitchen/api/menu");
+          filteredItems = menuItems;
+          renderMenu();
+        } catch (error) {
+          showToast(`Ошибка загрузки: ${error.message}`, "error");
+          menuBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div>⚠️</div>
+                <div>Не удалось загрузить меню</div>
+              </td>
+            </tr>
+          `;
+        }
+      }
+
+      function renderMenu() {
+        if (filteredItems.length === 0) {
+          menuBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div>🍽️</div>
+                <div>Блюд пока нет</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        menuBody.innerHTML = filteredItems.map(item => {
+          const composition = item.composition || [];
+          const compText = composition.length > 0
+            ? composition.map(c => {
+                const ing = ingredients.find(i => i.id === c.ingredient_id);
+                return ing ? `${ing.name} (${c.quantity})` : "";
+              }).filter(Boolean).join(", ")
+            : "Нет ингредиентов";
+          return `
+            <tr>
+              <td>${item.id}</td>
+              <td><strong>${escapeHtml(item.name)}</strong></td>
+              <td>${item.price.toFixed(2)} ₽</td>
+              <td class="composition">${escapeHtml(compText)}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-secondary btn-sm" onclick="editMenuItem(${item.id})">✏️ Изменить</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteMenuItem(${item.id}, '${escapeHtml(item.name)}')">🗑️ Удалить</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      searchInput.addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        filteredItems = term === "" ? menuItems : menuItems.filter(item =>
+          item.name.toLowerCase().includes(term)
+        );
+        renderMenu();
+      });
+
+      menuForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const composition = Array.from(ingredientsList.querySelectorAll(".ingredient-item"))
+          .map(row => {
+            const select = row.querySelector(".ingredient-select");
+            const quantity = parseInt(row.querySelector(".ingredient-quantity").value);
+            if (!select.value || !quantity || quantity < 1) return null;
+            return { ingredient_id: parseInt(select.value), quantity };
+          })
+          .filter(Boolean);
+
+        const payload = {
+          name: menuName.value.trim(),
+          price: parseFloat(menuPrice.value),
+          composition,
+        };
+
+        if (payload.name.length < 2) {
+          showToast("Название должно быть не короче 2 символов", "error");
+          return;
+        }
+
+        if (payload.price < 0) {
+          showToast("Цена должна быть неотрицательной", "error");
+          return;
+        }
+
+        try {
+          const submitBtn = document.getElementById("modalSubmit");
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="loading"></span> Сохранение...';
+
+          const id = menuId.value;
+          if (id) {
+            await fetchJSON(`/kitchen/api/menu/${id}`, {
+              method: "PUT",
+              body: JSON.stringify(payload),
+            });
+            showToast("Блюдо успешно обновлено");
+          } else {
+            await fetchJSON("/kitchen/api/menu", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            showToast("Блюдо успешно добавлено");
+          }
+
+          closeModal();
+          await loadMenu();
+        } catch (error) {
+          showToast(`Ошибка: ${error.message}`, "error");
+        } finally {
+          const submitBtn = document.getElementById("modalSubmit");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Сохранить";
+        }
+      });
+
+      window.editMenuItem = function (id) {
+        const item = menuItems.find(i => i.id === id);
+        if (item) openModal(item);
+      };
+
+      window.deleteMenuItem = async function (id, name) {
+        if (!confirm(`Удалить "${name}"?`)) return;
+        try {
+          await fetchJSON(`/kitchen/api/menu/${id}`, { method: "DELETE" });
+          showToast("Блюдо успешно удалено");
+          await loadMenu();
+        } catch (error) {
+          showToast(`Ошибка удаления: ${error.message}`, "error");
+        }
+      };
+
+      document.getElementById("refreshBtn").addEventListener("click", async () => {
+        const btn = document.getElementById("refreshBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Обновление...';
+        await Promise.all([loadIngredients(), loadMenu()]);
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Обновить';
+      });
+
+      document.getElementById("homeBtn").addEventListener("click", () => {
+        window.location.href = window.location.origin + "/";
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/logout";
+        document.body.appendChild(form);
+        form.submit();
+      });
+
+      Promise.all([loadIngredients(), loadMenu()]);
+    </script>
+  </body>
+</html>
+

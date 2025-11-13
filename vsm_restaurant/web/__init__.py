@@ -12,6 +12,9 @@ from .cooking_api import router as cooking_router
 from .payment_api import router as payment_router
 from .conductor_api import router as conductor_router
 from .passenger_api import router as passenger_router
+from .warehouse_ui import router as warehouse_router
+from .kitchen_ui import router as kitchen_router
+from .passenger_ui import router as passenger_ui_router
 import asyncio
 from sqlmodel import Session
 from vsm_restaurant.services.payment_timeout import PaymentTimeoutService
@@ -32,6 +35,9 @@ app.include_router(cooking_router)
 app.include_router(payment_router)
 app.include_router(conductor_router)
 app.include_router(passenger_router)
+app.include_router(warehouse_router)
+app.include_router(kitchen_router)
+app.include_router(passenger_ui_router)
 @app.get("/")
 async def root():
     return "Hello world"

@@ -1,15 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from vsm_restaurant.db.menu import MenuItemModel
 from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.schemas.menu import MenuItemCreate, MenuItemOut, IngredientCreate, IngredientOut, IngredientUpdate
+from vsm_restaurant.schemas.menu import MenuItemCreate, MenuItemOut
 
 router = APIRouter()
-STATIC_TOKEN = "1w348995u85349i3i230irejgi21-0-1dk"
-
-def check_token(authorization: str = Header(...)):
-    if authorization != f"Bearer {STATIC_TOKEN}":
-        raise HTTPException(status_code=401, detail="Unauthorized")
 
 # Public - get menu
 @router.get("/menu", response_model=list[MenuItemOut])
@@ -28,7 +23,7 @@ async def list_menu(session: SessionDep):
     ]
 
 # Admin - create menu item
-@router.post("/menu", response_model=MenuItemOut, dependencies=[Depends(check_token)])
+@router.post("/menu", response_model=MenuItemOut)
 async def create_menu_item(item: MenuItemCreate, session: SessionDep):
     db_item = MenuItemModel(**item.dict())
     session.add(db_item)
@@ -43,7 +38,7 @@ async def create_menu_item(item: MenuItemCreate, session: SessionDep):
     )
 
 # Admin - update menu item
-@router.put("/menu/{item_id}", response_model=MenuItemOut, dependencies=[Depends(check_token)])
+@router.put("/menu/{item_id}", response_model=MenuItemOut)
 async def update_menu_item(item_id: int, item: MenuItemCreate, session: SessionDep):
     db_item = session.get(MenuItemModel, item_id)
     if not db_item:
@@ -65,7 +60,7 @@ async def update_menu_item(item_id: int, item: MenuItemCreate, session: SessionD
     )
 
 # Admin - delete menu item
-@router.delete("/menu/{item_id}", dependencies=[Depends(check_token)])
+@router.delete("/menu/{item_id}")
 async def delete_menu_item(item_id: int, session: SessionDep):
     db_item = session.get(MenuItemModel, item_id)
     if not db_item:
