@@ -1,3 +1,11 @@
+"""
+API для пассажиров.
+
+Содержит endpoints для:
+- Просмотра доступного меню
+- Просмотра статуса своего заказа
+- Отмены заказа
+"""
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select, Session, func
 from vsm_restaurant.dependencies import SessionDep

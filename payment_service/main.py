@@ -25,6 +25,8 @@
 #     print(f"Refund issued for order {order_id}")
 #     return {"status": "refunded"}
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 import httpx
 import random
 
@@ -33,13 +35,21 @@ app = FastAPI(title="Fake Payment Service")
 # Временное хранилище для демо
 payments_db = {}
 
+class PaymentCreateRequest(BaseModel):
+    order_id: int
+    amount: float
+    type: str = "card"
+
 @app.post("/create")
-def create_payment(order_id: int, amount: float, type: str = "card"):
+def create_payment(request: PaymentCreateRequest):
+    order_id = request.order_id
+    amount = request.amount
+    payment_type = request.type
     # Генерируем ссылку на оплату
     payment_id = f"pay_{random.randint(1000, 9999)}"
     
     # Для СБП генерируем специальную ссылку
-    if type == "sbp":
+    if payment_type == "sbp":
         payment_link = f"http://localhost:8001/pay/sbp/{payment_id}"
     else:
         payment_link = f"http://localhost:8001/pay/{payment_id}"
@@ -48,7 +58,7 @@ def create_payment(order_id: int, amount: float, type: str = "card"):
         "order_id": order_id,
         "amount": amount,
         "status": "pending",
-        "type": type
+        "type": payment_type
     }
     
     return {
@@ -57,7 +67,7 @@ def create_payment(order_id: int, amount: float, type: str = "card"):
         "status": "created"
     }
 
-@app.get("/pay/{payment_id}")
+@app.get("/pay/{payment_id}", response_class=HTMLResponse)
 def simulate_payment(payment_id: str):
     """Симуляция страницы оплаты"""
     payment = payments_db.get(payment_id)
@@ -79,17 +89,38 @@ def simulate_payment(payment_id: str):
     </html>
     """
 
-@app.get("/pay/sbp/{payment_id}")
+@app.get("/pay/sbp/{payment_id}", response_class=HTMLResponse)
 def simulate_sbp_payment(payment_id: str):
-    """Симуляция страницы оплаты через СБП"""
+    """Симуляция оплаты через СБП - автоматически подтверждает оплату"""
     payment = payments_db.get(payment_id)
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
     
+    # Автоматически подтверждаем оплату
+    if payment["status"] == "pending":
+        payment["status"] = "success"
+        print(f"Payment {payment_id} confirmed for order {payment['order_id']}")
+        
+        # Отправляем вебхук основному сервису (синхронно, чтобы убедиться, что он отправлен)
+        try:
+            print(f"Sending webhook to restaurant-api for order {payment['order_id']}")
+            r = httpx.post(
+                "http://restaurant-api:8000/payments/webhook",
+                json={"order_id": payment["order_id"], "status": "success"},
+                timeout=5.0
+            )
+            r.raise_for_status()
+            print(f"Webhook sent successfully for order {payment['order_id']}")
+        except Exception as e:
+            print(f"Webhook error for order {payment['order_id']}: {e}")
+            # Не прерываем выполнение, просто логируем ошибку
+    
+    # Показываем страницу успешной оплаты
     return f"""
     <html>
         <head>
             <title>Оплата через СБП</title>
+            <meta http-equiv="refresh" content="3;url=http://localhost:3000">
             <style>
                 body {{
                     font-family: Arial, sans-serif;
@@ -103,9 +134,10 @@ def simulate_sbp_payment(payment_id: str):
                     padding: 30px;
                     border-radius: 10px;
                     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    text-align: center;
                 }}
                 h1 {{
-                    color: #333;
+                    color: #4CAF50;
                 }}
                 .amount {{
                     font-size: 24px;
@@ -113,39 +145,24 @@ def simulate_sbp_payment(payment_id: str):
                     color: #4CAF50;
                     margin: 20px 0;
                 }}
-                button {{
-                    background: #4CAF50;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    margin: 10px 5px;
+                .success-icon {{
+                    font-size: 64px;
+                    color: #4CAF50;
+                    margin: 20px 0;
                 }}
-                button:hover {{
-                    background: #45a049;
-                }}
-                .cancel-btn {{
-                    background: #f44336;
-                }}
-                .cancel-btn:hover {{
-                    background: #da190b;
+                .message {{
+                    color: #666;
+                    margin: 20px 0;
                 }}
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>Оплата через СБП</h1>
+                <div class="success-icon">✓</div>
+                <h1>Оплата успешно выполнена!</h1>
                 <p>Заказ #{payment['order_id']}</p>
                 <div class="amount">Сумма: {payment['amount']} руб.</div>
-                <p>Для оплаты используйте QR код или перейдите по ссылке в приложении банка.</p>
-                <form action="/confirm/{payment_id}" method="post">
-                    <button type="submit">Подтвердить оплату</button>
-                </form>
-                <form action="/cancel/{payment_id}" method="post">
-                    <button type="submit" class="cancel-btn">Отмена</button>
-                </form>
+                <p class="message">Вы будете перенаправлены на главную страницу через 3 секунды...</p>
             </div>
         </body>
     </html>

@@ -46,6 +46,36 @@
         margin: 0;
       }
 
+      .nav-menu {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+      }
+
+      .nav-link:hover {
+        background: rgba(148, 163, 184, 0.1);
+        color: #f1f5f9;
+        border-color: rgba(148, 163, 184, 0.2);
+      }
+
+      .nav-link.active {
+        background: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+
       .header-actions {
         display: flex;
         gap: 12px;
@@ -513,6 +543,13 @@
         <div class="header-title">
           <h1>Кухня</h1>
         </div>
+        <nav class="nav-menu">
+          <a href="/" class="nav-link">Главная</a>
+          <a href="/waiter" class="nav-link">Официант</a>
+          <a href="/passenger" class="nav-link">Пассажир</a>
+          <a href="/kitchen" class="nav-link active">Кухня</a>
+          <a href="/warehouse" class="nav-link">Склад</a>
+        </nav>
         <div class="header-actions">
           <button class="btn btn-primary" id="addBtn">+ Добавить блюдо</button>
           <button class="btn btn-secondary" id="homeBtn">На главную</button>

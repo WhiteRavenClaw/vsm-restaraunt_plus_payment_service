@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Заказы - Официант</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        min-height: 100vh;
+        color: #e2e8f0;
+      }
+
+      header {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        padding: 20px 24px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0;
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+      }
+
+      .nav-link:hover {
+        background: rgba(148, 163, 184, 0.1);
+        color: #f1f5f9;
+        border-color: rgba(148, 163, 184, 0.2);
+      }
+
+      .nav-link.active {
+        background: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+        color: white;
+        box-shadow: 0 4px 6px rgba(139, 92, 246, 0.4);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(139, 92, 246, 0.5);
+        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+      }
+
+      .btn-success {
+        background: #10b981;
+        color: white;
+      }
+
+      .btn-success:hover:not(:disabled) {
+        background: #059669;
+      }
+
+      .btn-warning {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .btn-warning:hover:not(:disabled) {
+        background: #d97706;
+      }
+
+      .btn-secondary {
+        background: rgba(30, 41, 59, 0.8);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(51, 65, 85, 0.9);
+        border-color: rgba(148, 163, 184, 0.3);
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 32px auto;
+        padding: 0 24px 48px;
+      }
+
+      .filters {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .filter-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        padding: 10px 16px;
+        border: 2px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(15, 23, 42, 0.6);
+        color: #e2e8f0;
+      }
+
+      .filter-group select:focus,
+      .filter-group input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+      }
+
+      .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 20px;
+      }
+
+      .order-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.2s ease;
+      }
+
+      .order-card:hover {
+        border-color: rgba(139, 92, 246, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .order-id {
+        font-size: 18px;
+        font-weight: 700;
+        color: #f1f5f9;
+      }
+
+      .order-status {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-waiting_payment {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .status-paid {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .status-cooking {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fde047;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+
+      .status-partially_delivered {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .status-completed {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .status-cancelled {
+        background: rgba(107, 114, 128, 0.2);
+        color: #d1d5db;
+        border: 1px solid rgba(107, 114, 128, 0.3);
+      }
+
+      .order-info {
+        margin-bottom: 16px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .info-label {
+        color: #94a3b8;
+      }
+
+      .info-value {
+        color: #f1f5f9;
+        font-weight: 600;
+      }
+
+      .payment-method {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 6px;
+        font-size: 12px;
+      }
+
+      .order-items {
+        margin-bottom: 16px;
+        padding: 12px;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 8px;
+      }
+
+      .order-items-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+      }
+
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .order-item:last-child {
+        border-bottom: none;
+      }
+
+      .order-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .order-actions .btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+        font-size: 13px;
+        padding: 8px 16px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #94a3b8;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(148, 163, 184, 0.3);
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .toast {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+        color: #e2e8f0;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .toast.success {
+        border-left: 4px solid #48bb78;
+      }
+
+      .toast.error {
+        border-left: 4px solid #f56565;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal {
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        margin-bottom: 24px;
+      }
+
+      .modal-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 8px;
+      }
+
+      .modal-body {
+        margin-bottom: 24px;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      @media (max-width: 768px) {
+        .orders-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .filters {
+          flex-direction: column;
+        }
+
+        .filter-group {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Заказы - Официант</h1>
+        </div>
+        <nav class="nav-menu">
+          <a href="/" class="nav-link">Главная</a>
+          <a href="/waiter" class="nav-link active">Официант</a>
+          <a href="/passenger" class="nav-link">Пассажир</a>
+          <a href="/kitchen" class="nav-link">Кухня</a>
+          <a href="/warehouse" class="nav-link">Склад</a>
+        </nav>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="refreshBtn">🔄 Обновить</button>
+          <button class="btn btn-secondary" id="homeBtn">На главную</button>
+          <button class="btn btn-danger" id="logoutBtn">Выход</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="filters">
+        <div class="filter-group">
+          <label>Статус</label>
+          <select id="statusFilter">
+            <option value="">Все статусы</option>
+            <option value="waiting_payment">Ожидает оплаты</option>
+            <option value="paid">Оплачен</option>
+            <option value="cooking">Готовится</option>
+            <option value="partially_delivered">Частично доставлен</option>
+            <option value="completed">Завершен</option>
+            <option value="cancelled">Отменен</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Место</label>
+          <input type="text" id="placeFilter" placeholder="Номер места">
+        </div>
+        <div class="filter-group">
+          <label>Способ оплаты</label>
+          <select id="paymentFilter">
+            <option value="">Все способы</option>
+            <option value="cash">Наличные</option>
+            <option value="card_terminal">Карта (терминал)</option>
+            <option value="card_online">Карта онлайн</option>
+            <option value="sbp">СБП</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="orders-grid" id="ordersGrid">
+        <div class="empty-state">
+          <div class="loading" style="margin: 0 auto;"></div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="orderModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalTitle">Детали заказа</h2>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="closeModal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      let orders = [];
+      let currentFilters = {
+        status: '',
+        place_id: '',
+        payment_method: ''
+      };
+
+      const ordersGrid = document.getElementById("ordersGrid");
+      const statusFilter = document.getElementById("statusFilter");
+      const placeFilter = document.getElementById("placeFilter");
+      const paymentFilter = document.getElementById("paymentFilter");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const orderModal = document.getElementById("orderModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalBody = document.getElementById("modalBody");
+      const closeModal = document.getElementById("closeModal");
+      const toastContainer = document.getElementById("toastContainer");
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div>${message}</div>
+        `;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideIn 0.3s ease reverse";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, {
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          ...options,
+        });
+        
+        // Клонируем response для чтения текста без потери данных
+        const responseClone = response.clone();
+        
+        // Проверяем, что ответ - это JSON, а не HTML
+        const contentType = response.headers.get("content-type") || "";
+        
+        // Если это не JSON, пытаемся прочитать текст для диагностики
+        if (!contentType.includes("application/json")) {
+          let errorText = "";
+          try {
+            errorText = await responseClone.text();
+            // Если это HTML, пытаемся найти ошибку
+            if (errorText.includes("<html") || errorText.includes("<!DOCTYPE")) {
+              errorText = "Получен HTML вместо JSON. Возможно, требуется авторизация или маршрут не найден.";
+            }
+          } catch (e) {
+            errorText = `Не удалось прочитать ответ: ${e.message}`;
+          }
+          
+          // Если это редирект или HTML страница, пробрасываем ошибку
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Требуется авторизация. Пожалуйста, войдите в систему.");
+          }
+          if (response.status === 404) {
+            throw new Error(`Маршрут не найден: ${url}. Проверьте, что сервер запущен.`);
+          }
+          if (response.status === 500) {
+            throw new Error(`Ошибка сервера: ${errorText || contentType || 'неизвестная ошибка'}`);
+          }
+          throw new Error(`Ожидался JSON, но получен ${contentType || 'неизвестный тип'}. Ответ: ${errorText.substring(0, 200)}`);
+        }
+        
+        if (!response.ok) {
+          let detail = "";
+          try {
+            const data = await response.json();
+            detail = data.detail || response.statusText;
+          } catch (err) {
+            // Если не удалось распарсить JSON, читаем текст из клона
+            try {
+              const text = await responseClone.text();
+              detail = text || response.statusText || `HTTP ${response.status}`;
+            } catch (e) {
+              detail = response.statusText || `HTTP ${response.status}`;
+            }
+          }
+          throw new Error(detail);
+        }
+        if (response.status === 204) return null;
+        
+        try {
+          return await response.json();
+        } catch (err) {
+          // Если не удалось распарсить, пытаемся прочитать текст из клона
+          const text = await responseClone.text();
+          throw new Error(`Ошибка парсинга JSON: ${err.message}. Ответ: ${text.substring(0, 200)}`);
+        }
+      }
+
+      function getStatusText(status) {
+        const statusMap = {
+          'waiting_payment': 'Ожидает оплаты',
+          'paid': 'Оплачен',
+          'cooking': 'Готовится',
+          'partially_delivered': 'Частично доставлен',
+          'completed': 'Завершен',
+          'cancelled': 'Отменен'
+        };
+        return statusMap[status] || status;
+      }
+
+      function getPaymentMethodText(method) {
+        const methodMap = {
+          'cash': '💵 Наличные',
+          'card_terminal': '💳 Карта (терминал)',
+          'card_online': '💳 Карта онлайн',
+          'sbp': '📱 СБП'
+        };
+        return methodMap[method] || method;
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+
+      async function loadOrders() {
+        try {
+          let url = '/waiter/orders?';
+          const params = new URLSearchParams();
+          
+          if (currentFilters.status) {
+            params.append('status', currentFilters.status);
+          }
+          if (currentFilters.place_id) {
+            params.append('place_id', currentFilters.place_id);
+          }
+          
+          url += params.toString();
+          
+          const data = await fetchJSON(url);
+          orders = data || [];
+          
+          // Фильтруем по способу оплаты на клиенте
+          if (currentFilters.payment_method) {
+            orders = orders.filter(order => order.payment_method === currentFilters.payment_method);
+          }
+          
+          renderOrders();
+        } catch (error) {
+          showToast(`Ошибка загрузки заказов: ${error.message}`, "error");
+          ordersGrid.innerHTML = `
+            <div class="empty-state">
+              <div>⚠️</div>
+              <div>Не удалось загрузить заказы</div>
+            </div>
+          `;
+        }
+      }
+
+      function renderOrders() {
+        if (orders.length === 0) {
+          ordersGrid.innerHTML = `
+            <div class="empty-state">
+              <div>📋</div>
+              <div>Заказов нет</div>
+            </div>
+          `;
+          return;
+        }
+
+        ordersGrid.innerHTML = orders.map(order => {
+          const statusClass = `status-${order.status}`;
+          return `
+            <div class="order-card">
+              <div class="order-header">
+                <div>
+                  <div class="order-id">Заказ #${order.id}</div>
+                  <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                    ${formatDate(order.created_at)}
+                  </div>
+                </div>
+                <div class="order-status ${statusClass}">
+                  ${getStatusText(order.status)}
+                </div>
+              </div>
+              
+              <div class="order-info">
+                <div class="info-row">
+                  <span class="info-label">Место:</span>
+                  <span class="info-value">${order.place_id}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Сумма:</span>
+                  <span class="info-value">${order.total_price.toFixed(2)} ₽</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Оплата:</span>
+                  <span class="info-value">
+                    <span class="payment-method">${getPaymentMethodText(order.payment_method)}</span>
+                  </span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Позиций:</span>
+                  <span class="info-value">${order.item_count}</span>
+                </div>
+              </div>
+
+              <div class="order-actions">
+                <button class="btn btn-secondary" onclick="viewOrderDetails(${order.id})">
+                  Детали
+                </button>
+                ${order.status === 'waiting_payment' && (order.payment_method === 'cash' || order.payment_method === 'card_terminal') ? `
+                  <button class="btn btn-success" onclick="confirmPayment(${order.id}, '${order.payment_method}')">
+                    Подтвердить оплату
+                  </button>
+                ` : ''}
+                ${order.status === 'paid' || order.status === 'cooking' ? `
+                  <button class="btn btn-warning" onclick="updateStatus(${order.id}, 'partially_delivered')">
+                    Частично доставлен
+                  </button>
+                ` : ''}
+                ${order.status === 'partially_delivered' ? `
+                  <button class="btn btn-success" onclick="updateStatus(${order.id}, 'completed')">
+                    Завершить
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      async function viewOrderDetails(orderId) {
+        try {
+          const order = await fetchJSON(`/waiter/orders/${orderId}`);
+          
+          modalTitle.textContent = `Заказ #${order.id}`;
+          modalBody.innerHTML = `
+            <div class="order-info">
+              <div class="info-row">
+                <span class="info-label">Место:</span>
+                <span class="info-value">${order.place_id}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Статус:</span>
+                <span class="info-value">
+                  <span class="order-status status-${order.status}">
+                    ${getStatusText(order.status)}
+                  </span>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Сумма:</span>
+                <span class="info-value">${order.total_price.toFixed(2)} ₽</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Способ оплаты:</span>
+                <span class="info-value">
+                  <span class="payment-method">${getPaymentMethodText(order.payment_method)}</span>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Создан:</span>
+                <span class="info-value">${formatDate(order.created_at)}</span>
+              </div>
+              ${order.payment_link ? `
+                <div class="info-row">
+                  <span class="info-label">Ссылка на оплату:</span>
+                  <span class="info-value" style="word-break: break-all; font-size: 12px;">
+                    ${order.payment_link}
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="order-items" style="margin-top: 20px;">
+              <div class="order-items-title">Позиции заказа</div>
+              ${order.items.map(item => `
+                <div class="order-item">
+                  <span>${item.menu_item?.name || 'Неизвестно'} × ${item.quantity}</span>
+                  <span>${item.menu_item?.price ? (parseFloat(item.menu_item.price) * item.quantity).toFixed(2) : '0.00'} ₽</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          
+          orderModal.classList.add("active");
+        } catch (error) {
+          showToast(`Ошибка загрузки деталей: ${error.message}`, "error");
+        }
+      }
+
+      async function confirmPayment(orderId, paymentMethod) {
+        if (!confirm(`Подтвердить получение оплаты (${getPaymentMethodText(paymentMethod)})?`)) {
+          return;
+        }
+
+        try {
+          await fetchJSON(`/waiter/orders/${orderId}/payment`, {
+            method: 'POST',
+            body: JSON.stringify({ payment_method: paymentMethod })
+          });
+          showToast("Оплата подтверждена");
+          loadOrders();
+        } catch (error) {
+          showToast(`Ошибка: ${error.message}`, "error");
+        }
+      }
+
+      async function updateStatus(orderId, newStatus) {
+        const statusText = getStatusText(newStatus);
+        if (!confirm(`Изменить статус заказа на "${statusText}"?`)) {
+          return;
+        }
+
+        try {
+          await fetchJSON(`/waiter/orders/${orderId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: newStatus })
+          });
+          showToast(`Статус изменен на "${statusText}"`);
+          loadOrders();
+        } catch (error) {
+          showToast(`Ошибка: ${error.message}`, "error");
+        }
+      }
+
+      statusFilter.addEventListener("change", (e) => {
+        currentFilters.status = e.target.value;
+        loadOrders();
+      });
+
+      placeFilter.addEventListener("input", (e) => {
+        currentFilters.place_id = e.target.value.trim();
+        loadOrders();
+      });
+
+      paymentFilter.addEventListener("change", (e) => {
+        currentFilters.payment_method = e.target.value;
+        loadOrders();
+      });
+
+      refreshBtn.addEventListener("click", () => {
+        loadOrders();
+      });
+
+      closeModal.addEventListener("click", () => {
+        orderModal.classList.remove("active");
+      });
+
+      orderModal.addEventListener("click", (e) => {
+        if (e.target === orderModal) {
+          orderModal.classList.remove("active");
+        }
+      });
+
+      document.getElementById("homeBtn").addEventListener("click", () => {
+        window.location.href = window.location.origin + "/";
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/logout";
+        document.body.appendChild(form);
+        form.submit();
+      });
+
+      window.viewOrderDetails = viewOrderDetails;
+      window.confirmPayment = confirmPayment;
+      window.updateStatus = updateStatus;
+
+      // Автообновление каждые 10 секунд
+      loadOrders();
+      setInterval(loadOrders, 10000);
+    </script>
+  </body>
+</html>
+

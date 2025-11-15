@@ -4,7 +4,7 @@ from datetime import datetime
 from ..db.orders import OrderStatus, PaymentMethod
 from .orders import OrderOut
 
-class ConductorOrderSummary(BaseModel):
+class WaiterOrderSummary(BaseModel):
     id: int
     place_id: str
     status: OrderStatus
@@ -18,3 +18,4 @@ class DeliveryUpdate(BaseModel):
 
 class PaymentReceived(BaseModel):
     payment_method: PaymentMethod  # Для подтверждения способа оплаты
+

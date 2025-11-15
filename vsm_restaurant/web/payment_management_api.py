@@ -1,13 +1,27 @@
+"""
+API для управления платежами и обработки вебхуков от платежной системы.
+
+Содержит endpoints для:
+- Получения статуса оплаты заказа
+- Смены способа оплаты
+- Продления времени оплаты
+- Обработки вебхуков от платежной системы
+"""
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from sqlmodel import select, Session
 from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.db.orders import Order, OrderStatus, PaymentMethod
+from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
+from vsm_restaurant.db.cooking_task import CookingTask, CookingStatus
 from vsm_restaurant.services.payment_timeout import check_payment_timeout, set_payment_timeout
+from vsm_restaurant.services.availability import reserve_ingredients
 from vsm_restaurant.settings import Settings
 from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
 import httpx
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 class PaymentMethodSwitch(BaseModel):
@@ -151,15 +165,24 @@ async def extend_payment_timeout(order_id: int, session: SessionDep):
 
 @router.post("/payments/webhook")
 async def payment_webhook(webhook_data: dict, session: SessionDep):
-    """Обработка вебхуков от платежной системы с проверкой конфликтов"""
+    """
+    Обработка вебхуков от платежной системы с проверкой конфликтов.
+    
+    Обрабатывает уведомления о статусе оплаты от платежной системы.
+    При успешной оплате создает задачи на готовку и резервирует ингредиенты.
+    Обрабатывает конфликты (например, когда заказ отменен, но платеж прошел).
+    """
     order_id = webhook_data.get("order_id")
     status = webhook_data.get("status")
     
     if not order_id or not status:
         raise HTTPException(status_code=400, detail="Invalid webhook data")
     
+    logger.info(f"Received webhook for order {order_id} with status {status}")
+    
     order = session.get(Order, order_id)
     if not order:
+        logger.error(f"Order {order_id} not found")
         raise HTTPException(status_code=404, detail="Order not found")
     
     # Проверяем на конфликт: если заказ уже отменен из-за таймаута
@@ -191,24 +214,24 @@ async def payment_webhook(webhook_data: dict, session: SessionDep):
     
     # Нормальная обработка успешного платежа
     if status == "success" and order.status == OrderStatus.WAITING_PAYMENT:
+        logger.info(f"Processing payment for order {order_id}")
+        
         order.status = OrderStatus.PAID
         order.payment_timeout_at = None  # Сбрасываем таймаут
         order.updated_at = datetime.now()
         
         # Создаем задачи на готовку
-        from sqlmodel import select
-        from ..db.cooking_task import CookingTask, CookingStatus
-        from ..db.menu import OrderItem
-        from ..services.availability import reserve_ingredients
-        
         order_items = session.exec(
             select(OrderItem).where(OrderItem.order_id == order_id)
         ).all()
+        
+        logger.info(f"Found {len(order_items)} items for order {order_id}")
         
         for item in order_items:
             # Резервируем ингредиенты
             reserve_ingredients(session, item.menu_item_id)
             
+            # Создаем задачу на готовку
             task = CookingTask(
                 order_id=order.id,
                 menu_item_id=item.menu_item_id,
@@ -217,6 +240,8 @@ async def payment_webhook(webhook_data: dict, session: SessionDep):
             session.add(task)
         
         session.commit()
+        session.refresh(order)
+        logger.info(f"Order {order_id} status updated to {order.status}")
         
         return {
             "status": "processed",
@@ -224,4 +249,5 @@ async def payment_webhook(webhook_data: dict, session: SessionDep):
             "order_id": order_id
         }
     
+    logger.warning(f"Webhook ignored for order {order_id}: status={status}, order_status={order.status}")
     return {"status": "ignored", "message": "Webhook processed but no action taken"}
