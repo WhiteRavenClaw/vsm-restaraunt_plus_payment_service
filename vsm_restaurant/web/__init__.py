@@ -20,10 +20,10 @@ from .waiter_api import router as waiter_api_router
 from .passenger_api import router as passenger_router
 
 # UI роутеры
-from .warehouse_ui import router as warehouse_router
-from .kitchen_ui import router as kitchen_router
-from .passenger_ui import router as passenger_ui_router
-from .waiter_ui import router as waiter_ui_router
+from .warehouse import router as warehouse_router
+from .kitchen import router as kitchen_router
+from .passenger import router as passenger_ui_router
+from .waiter import router as waiter_ui_router
 import asyncio
 from sqlmodel import Session
 from vsm_restaurant.services.payment_timeout import PaymentTimeoutService
