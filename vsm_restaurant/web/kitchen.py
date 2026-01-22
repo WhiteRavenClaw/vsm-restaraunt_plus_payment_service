@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 
-from vsm_restaurant.db.menu import MenuItemModel, IngredientModel
+from vsm_restaurant.db.menu import IngredientModel, MenuItemModel
 from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.schemas.menu import MenuItemCreate, MenuItemOut, IngredientOut
+from vsm_restaurant.schemas.menu import IngredientOut, MenuItemCreate, MenuItemOut
 
 router = APIRouter()
 templates = Jinja2Templates(directory="vsm_restaurant/web/templates")
@@ -14,11 +14,6 @@ templates = Jinja2Templates(directory="vsm_restaurant/web/templates")
 @router.get("/kitchen", response_class=HTMLResponse)
 async def kitchen_page(request: Request):
     return templates.TemplateResponse("kitchen.html", {"request": request})
-
-
-@router.get("/кухня", include_in_schema=False)
-async def kitchen_page_cyrillic_alias():
-    return RedirectResponse(url="/kitchen", status_code=307)
 
 
 @router.get("/kitchen/api/menu", response_model=list[MenuItemOut])
@@ -89,4 +84,3 @@ async def kitchen_delete_menu_item(item_id: int, session: SessionDep):
     session.delete(model)
     session.commit()
     return {"detail": "Menu item deleted"}
-

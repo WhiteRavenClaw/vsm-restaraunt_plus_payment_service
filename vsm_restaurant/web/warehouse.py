@@ -1,15 +1,11 @@
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 
 from vsm_restaurant.db.menu import IngredientModel
 from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.schemas.menu import (
-    IngredientCreate,
-    IngredientOut,
-    IngredientUpdate,
-)
+from vsm_restaurant.schemas.menu import IngredientCreate, IngredientOut, IngredientUpdate
 
 router = APIRouter()
 templates = Jinja2Templates(directory="vsm_restaurant/web/templates")
@@ -31,11 +27,6 @@ async def warehouse_page(request: Request):
             "request": request,
         },
     )
-
-
-@router.get("/склад", include_in_schema=False)
-async def warehouse_page_cyrillic_alias():
-    return RedirectResponse(url="/warehouse", status_code=307)
 
 
 @router.get("/warehouse/api/ingredients", response_model=list[IngredientOut])
@@ -91,4 +82,3 @@ async def warehouse_delete_ingredient(
     session.delete(model)
     session.commit()
     return {"detail": "Ingredient deleted"}
-

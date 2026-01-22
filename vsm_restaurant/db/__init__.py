@@ -6,7 +6,6 @@ from sqlmodel import create_engine
 from ..settings import Settings
 
 # ТОЛЬКО SQLModel модели для Alembic
-from .demo import DemoModel
 from .menu import IngredientModel, MenuItemModel
 from .orders import Order, OrderItem
 from .cooking_task import CookingTask

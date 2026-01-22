@@ -10,20 +10,17 @@ from fastapi import FastAPI
 from vsm_restaurant.dependencies import lifespan
 
 # API роутеры
-from .demo import router as demo_router
-from .menu_api import router as menu_router
-from .ingredients_api import router as ingredients_router
-from .order_api import router as order_router
-from .cooking_api import router as cooking_router
-from .payment_management_api import router as payment_router
-from .waiter_api import router as waiter_api_router
-from .passenger_api import router as passenger_router
+from .menu import router as menu_router
+from .ingredients import router as ingredients_router
+from .orders import router as order_router
+from .cooking import router as cooking_router
+from .payments import router as payment_router
+from .waiter import router as waiter_router
+from .passenger import router as passenger_router
 
 # UI роутеры
 from .warehouse import router as warehouse_router
 from .kitchen import router as kitchen_router
-from .passenger import router as passenger_ui_router
-from .waiter import router as waiter_ui_router
 import asyncio
 from sqlmodel import Session
 from vsm_restaurant.services.payment_timeout import PaymentTimeoutService
@@ -36,20 +33,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI(lifespan=lifespan)
 
 # Регистрация API роутеров
-app.include_router(demo_router)
 app.include_router(menu_router)
 app.include_router(ingredients_router)
 app.include_router(order_router)
 app.include_router(cooking_router)
 app.include_router(payment_router)
-app.include_router(waiter_api_router)
+app.include_router(waiter_router)
 app.include_router(passenger_router)
 
 # Регистрация UI роутеров
 app.include_router(warehouse_router)
 app.include_router(kitchen_router)
-app.include_router(passenger_ui_router)
-app.include_router(waiter_ui_router)
 
 @app.get("/")
 async def root():
