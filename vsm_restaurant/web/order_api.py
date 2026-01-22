@@ -6,20 +6,19 @@ API для работы с заказами.
 - Просмотра списка заказов
 - Интеграции с платежной системой
 """
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlmodel import select, Session
-from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
-from vsm_restaurant.db.cooking_task import CookingTask, CookingStatus
-from vsm_restaurant.db.menu import MenuItemModel
-from vsm_restaurant.schemas.orders import OrderCreate, OrderOut
+import logging
+
 import httpx
-from vsm_restaurant.services.availability import check_menu_item_availability, reserve_ingredients
+from fastapi import APIRouter, HTTPException
+from sqlmodel import select
+
+from vsm_restaurant.dependencies import SessionDep
+from vsm_restaurant.db.menu import MenuItemModel
+from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
+from vsm_restaurant.schemas.orders import OrderCreate, OrderOut
+from vsm_restaurant.services.availability import check_menu_item_availability
 from vsm_restaurant.services.payment_timeout import set_payment_timeout
 from vsm_restaurant.settings import Settings
-import asyncio
-from datetime import datetime
-import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -28,7 +27,7 @@ router = APIRouter()
 def get_payment_service_url() -> str:
     """Получает URL платежного сервиса из настроек"""
     settings = Settings()
-    return getattr(settings, 'payment_service_url', 'http://payment-service:8001')
+    return settings.payment_service_url
 
 @router.get("/orders", response_model=list[OrderOut])
 def list_orders(session: SessionDep):
@@ -55,14 +54,13 @@ def list_orders(session: SessionDep):
         ))
     return result
 
-@router.post("/orders",response_model=dict)
-async def create_order(order_data: OrderCreate, session: SessionDep, background_tasks: BackgroundTasks):
+@router.post("/orders", response_model=dict)
+async def create_order(order_data: OrderCreate, session: SessionDep):
     try:
         logger.info(f"Creating order: place_id={order_data.place_id}, payment_method={order_data.payment_method}, items={order_data.items}")
         
         # Проверяем доступность блюд и рассчитываем стоимость
         total_price = 0.0
-        menu_items = []
         
         for item in order_data.items:
             menu_item = session.get(MenuItemModel, item.menu_item_id)
@@ -80,7 +78,6 @@ async def create_order(order_data: OrderCreate, session: SessionDep, background_
             # Конвертируем price в float, так как Numeric возвращает Decimal
             price = float(menu_item.price) if menu_item.price is not None else 0.0
             total_price += price * item.quantity
-            menu_items.append(menu_item)
         
         logger.info(f"Total price calculated: {total_price}")
         

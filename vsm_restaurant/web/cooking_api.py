@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException
-from sqlmodel import Session, select
-from vsm_restaurant.db.cooking_task import CookingTask, CookingStatus
-from vsm_restaurant.dependencies import SessionDep
 from pydantic import BaseModel
-from typing import List, Optional
+from fastapi import APIRouter, HTTPException
+from sqlmodel import select
+
+from vsm_restaurant.db.cooking_task import CookingStatus, CookingTask
+from vsm_restaurant.dependencies import SessionDep
 
 router = APIRouter()
 

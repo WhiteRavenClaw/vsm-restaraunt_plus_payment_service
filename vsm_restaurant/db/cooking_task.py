@@ -1,8 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from sqlmodel import Field, SQLModel, Relationship
 from typing import Optional
+
 from sqlalchemy import Column, DateTime
+from sqlmodel import Field, SQLModel, Relationship
 
 class CookingStatus(str, Enum):
     QUEUED = "queued"
@@ -22,4 +23,3 @@ class CookingTask(SQLModel, table=True):
     order: Optional["Order"] = Relationship(back_populates="cooking_tasks")
     menu_item: Optional["MenuItemModel"] = Relationship()
     # УБЕРИ отношения
-    # order: Optional["Order"] = Relationship(back_populates="cooking_tasks")

@@ -1,5 +1,6 @@
-from sqlmodel import Session, select
-from ..db.menu import MenuItemModel, IngredientModel
+from sqlmodel import Session
+
+from ..db.menu import IngredientModel, MenuItemModel
 
 def check_menu_item_availability(session: Session, menu_item_id: int) -> bool:
     menu_item = session.get(MenuItemModel, menu_item_id)

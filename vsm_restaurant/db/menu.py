@@ -1,8 +1,9 @@
+from typing import List
+
 from sqlalchemy import Column, Numeric
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.dialects.sqlite import VARCHAR, INTEGER
+from sqlalchemy.dialects.sqlite import INTEGER, VARCHAR
 from sqlmodel import Field, SQLModel, Relationship
-from typing import List, Optional, Dict
 
 class IngredientModel(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)

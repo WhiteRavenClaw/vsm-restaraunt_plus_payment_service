@@ -7,7 +7,7 @@ API для пассажиров.
 - Отмены заказа
 """
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select, Session, func
+from sqlmodel import func, select
 from vsm_restaurant.dependencies import SessionDep
 from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus
 from vsm_restaurant.db.menu import MenuItemModel

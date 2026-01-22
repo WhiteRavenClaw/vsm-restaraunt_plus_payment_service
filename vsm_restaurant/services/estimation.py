@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
-from ..db.cooking_task import CookingTask, CookingStatus
+
+from ..db.cooking_task import CookingStatus, CookingTask
 from ..db.orders import Order
-import datetime
 
 def estimate_completion_time(session: Session, order_id: int) -> str:
     """

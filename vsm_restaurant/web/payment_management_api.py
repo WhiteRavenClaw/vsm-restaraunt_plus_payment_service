@@ -7,19 +7,21 @@ API для управления платежами и обработки веб�
 - Продления времени оплаты
 - Обработки вебхуков от платежной системы
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from sqlmodel import select, Session
-from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
-from vsm_restaurant.db.cooking_task import CookingTask, CookingStatus
-from vsm_restaurant.services.payment_timeout import check_payment_timeout, set_payment_timeout
-from vsm_restaurant.services.availability import reserve_ingredients
-from vsm_restaurant.settings import Settings
-from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
-import httpx
 import logging
+from datetime import datetime
+from typing import Optional
+
+import httpx
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from sqlmodel import select
+
+from vsm_restaurant.dependencies import SessionDep
+from vsm_restaurant.db.cooking_task import CookingStatus, CookingTask
+from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
+from vsm_restaurant.services.availability import reserve_ingredients
+from vsm_restaurant.services.payment_timeout import check_payment_timeout, set_payment_timeout
+from vsm_restaurant.settings import Settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -74,8 +76,7 @@ async def get_payment_status(order_id: int, session: SessionDep):
 async def switch_payment_method(
     order_id: int, 
     switch_data: PaymentMethodSwitch,
-    session: SessionDep,
-    background_tasks: BackgroundTasks
+    session: SessionDep
 ):
     """Смена способа оплаты для заказа"""
     order = session.get(Order, order_id)
@@ -107,11 +108,6 @@ async def switch_payment_method(
         order.payment_timeout_at = None  # Сбрасываем таймаут
         
         # Создаем задачи на готовку
-        from sqlmodel import select
-        from ..db.cooking_task import CookingTask, CookingStatus
-        from ..db.menu import OrderItem
-        from ..services.availability import reserve_ingredients
-        
         order_items = session.exec(
             select(OrderItem).where(OrderItem.order_id == order_id)
         ).all()

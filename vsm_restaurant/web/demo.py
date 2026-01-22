@@ -24,7 +24,7 @@ async def list_demos(session: SessionDep, limit: int = 100, days: int = 7):
 
 
 @router.post("/demo/create")
-async def list_demos(session: SessionDep, model: DemoModel):
+async def create_demo(session: SessionDep, model: DemoModel):
     if model.timestamp is None:
         model.timestamp = datetime.now()
     if type(model.demo_enum) is str:

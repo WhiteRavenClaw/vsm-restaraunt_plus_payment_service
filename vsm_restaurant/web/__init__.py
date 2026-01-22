@@ -33,7 +33,6 @@ from vsm_restaurant.services.payment_timeout import PaymentTimeoutService
 
 logger = logging.getLogger(__name__)
 
-media_location_prefix = "/media/"
 app = FastAPI(lifespan=lifespan)
 
 # Регистрация API роутеров

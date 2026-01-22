@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 from sqlmodel import select, Session
-from ..db.orders import Order, OrderStatus, PaymentMethod
+from ..db.orders import Order, OrderStatus
 from ..settings import Settings
 import logging
 

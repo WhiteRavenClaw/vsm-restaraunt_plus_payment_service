@@ -3,10 +3,10 @@ from enum import Enum
 
 from pydantic import ConfigDict
 from sqlalchemy import Column
-from sqlalchemy.dialects.sqlite import TEXT, INTEGER, VARCHAR
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.sqlite import INTEGER, TEXT, VARCHAR
 from sqlalchemy.sql.schema import Index
 from sqlmodel import Field, SQLModel
-from sqlalchemy.dialects.postgresql import JSONB, insert
 
 
 class DemoEnumType(int, Enum):
@@ -35,4 +35,6 @@ class DemoModel(SQLModel, table=True):
     model_config = ConfigDict(use_enum_values=True)
 
     def demo_enum_name(self):
-        return DemoEnumType(self.media_type).name
+        if self.demo_enum is None:
+            return None
+        return DemoEnumType(self.demo_enum).name

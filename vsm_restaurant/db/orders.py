@@ -1,8 +1,8 @@
-from sqlmodel import Field, SQLModel, Relationship
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List
-from sqlalchemy import Column, DateTime
+from typing import List, Optional
+
+from sqlmodel import Field, SQLModel, Relationship
 
 class PaymentMethod(str, Enum):
     CARD_ONLINE = "card_online"
@@ -27,8 +27,6 @@ class OrderItem(SQLModel, table=True):
     quantity: int = Field(default=1)
     order: Optional["Order"] = Relationship(back_populates="items")
     menu_item: Optional["MenuItemModel"] = Relationship(back_populates="order_items")
-    
-    
 
 class Order(SQLModel, table=True):
     __tablename__ = "orders"
@@ -45,6 +43,3 @@ class Order(SQLModel, table=True):
     payment_link: Optional[str] = Field(default=None)
     items: List[OrderItem] = Relationship(back_populates="order")
     cooking_tasks: List["CookingTask"] = Relationship(back_populates="order")
-
-    
-    

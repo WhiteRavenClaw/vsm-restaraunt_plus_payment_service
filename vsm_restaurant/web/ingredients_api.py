@@ -2,7 +2,7 @@ from fastapi import APIRouter, Header, Depends, HTTPException
 from sqlmodel import select
 from vsm_restaurant.db.menu import IngredientModel
 from vsm_restaurant.dependencies import SessionDep
-from vsm_restaurant.schemas.menu import MenuItemCreate, MenuItemOut, IngredientCreate, IngredientOut, IngredientUpdate
+from vsm_restaurant.schemas.menu import IngredientCreate, IngredientOut, IngredientUpdate
 
 router = APIRouter()
 STATIC_TOKEN = "1w348995u85349i3i230irejgi21-0-1dk"

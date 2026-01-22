@@ -8,8 +8,7 @@ API для официанта.
 - Обновления статуса доставки заказа
 """
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select, Session, func
-from sqlalchemy import not_
+from sqlmodel import func, select
 from vsm_restaurant.dependencies import SessionDep
 from vsm_restaurant.db.orders import Order, OrderItem, OrderStatus, PaymentMethod
 from vsm_restaurant.db.cooking_task import CookingTask, CookingStatus
